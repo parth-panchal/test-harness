@@ -4,30 +4,41 @@ import json
 import sys
 
 
+def walk(obj, name):
+    if obj is None:
+        return f"{name} = null;"
+    elif isinstance(obj, bool):
+        return f"{name} = {str(obj).lower()};"
+    elif isinstance(obj, str):
+        return f'{name} = "{obj}";'
+    elif isinstance(obj, bytes):
+        return f'{name} = "{obj!r}";'
+    elif isinstance(obj, dict):
+        res = []
+        res.append(f"{name} = {{}};")
+        for k, v in sorted(obj.items()):
+            res.append(walk(v, name + convert("." + k)))
+        return "\n".join(sorted(res))
+    elif isinstance(obj, (list, tuple)):
+        res = []
+        res.append(f"{name} = [];")
+        for i, e in enumerate(obj):
+            res.append(walk(e, name + convert(str([i]))))
+        return "\n".join(res)
+    else:
+        return f"{name} = {obj!r};"
+
+
+def convert(name):
+    if "-" in name or " " in name:
+        return '["{}"]'.format(name[1:])
+    return name
+
+
 def gron(file):
     data = json.load(file)
-    formatted_json = format_json(data, outer=True)
-    return formatted_json
-
-
-def format_json(json_obj, parent_key="", sep=".", outer=False):
-    formatted = ""
-    if outer:
-        formatted += "json = {};\n"
-        parent_key = "json"
-    for key in sorted(json_obj.keys()):  # Sort keys alphabetically
-        value = json_obj[key]
-        current_key = f"{parent_key}{sep}{key}" if parent_key else key
-        if isinstance(value, dict):
-            formatted += f"{current_key} = {{}};\n"
-            formatted += format_json(value, current_key, sep=sep)
-        elif isinstance(value, list):
-            for i, item in enumerate(value):
-                item_key = f"{current_key}[{i}]"
-                formatted += format_json({item_key: item}, sep="") + "\n"
-        else:
-            formatted += f"{current_key} = {json.dumps(value)};\n"
-    return formatted.strip()
+    output = walk(data, "json")
+    return output
 
 
 def main():
@@ -40,7 +51,6 @@ def main():
         help="Input file",
     )
     args = parser.parse_args()
-
     result = gron(args.file)
     print(result)
 

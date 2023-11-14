@@ -1,0 +1,11 @@
+json = {};
+json.age = 30;
+json.city = "New York";
+json.contact = {};
+json.contact.email = "john.doe@example.com";
+json.contact.phone = "+1 123-456-7890";
+json.name = "John Doe";
+json.skills = [];
+json.skills[0] = "Python";
+json.skills[1] = "JavaScript";
+json.skills[2] = "SQL";
