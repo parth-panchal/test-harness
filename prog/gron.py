@@ -1,4 +1,3 @@
-# prog/gron.py
 import argparse
 import json
 import sys
@@ -35,14 +34,27 @@ def convert(name):
     return name
 
 
-def gron(file):
-    data = json.load(file)
-    output = walk(data, "json")
-    return output
+def gron(file, base_object="json"):
+    try:
+        data = json.load(file)
+        output = walk(data, base_object)
+        return output
+    except json.JSONDecodeError as e:
+        sys.stderr.write(f"Error decoding JSON: {e}\n")
+        sys.exit(1)
+    except Exception as e:
+        sys.stderr.write(f"An unexpected error occurred: {e}\n")
+        sys.exit(1)
 
 
 def main():
     parser = argparse.ArgumentParser(description="JSON flattening utility")
+    parser.add_argument(
+        "--obj",
+        dest="base_object",
+        default="json",
+        help="Specify the base object name (default: json)",
+    )
     parser.add_argument(
         "file",
         nargs="?",
@@ -51,8 +63,9 @@ def main():
         help="Input file",
     )
     args = parser.parse_args()
-    result = gron(args.file)
+    result = gron(args.file, args.base_object)
     print(result)
+    sys.exit(0)
 
 
 if __name__ == "__main__":
