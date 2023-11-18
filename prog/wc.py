@@ -3,89 +3,116 @@ import sys
 
 
 def wc(file, count_lines=True, count_words=True, count_characters=True):
-    lines = words = characters = 0
-    for line in file:
-        lines += 1
-        words += len(line.split())
-        characters += len(line)
-    result = []
-    if count_lines:
-        result.append(lines)
-    else:
-        result.append(0)
-    if count_words:
-        result.append(words)
-    else:
-        result.append(0)
-    if count_characters:
-        result.append(characters)
-    else:
-        result.append(0)
-    return result
+    try:
+        lines = words = characters = 0
+        for line in file:
+            lines += 1
+            words += len(line.split())
+            characters += len(line)
+        result = []
+        if count_lines:
+            result.append(lines)
+        if count_words:
+            result.append(words)
+        if count_characters:
+            result.append(characters)
+        return result
+    except Exception as e:
+        sys.stderr.write(f"Error: {e}\n")
+        sys.exit(1)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Word count utility")
-    parser.add_argument(
-        "-l",
-        "--lines",
-        action="store_true",
-        help="Count only lines",
-    )
-    parser.add_argument(
-        "-w",
-        "--words",
-        action="store_true",
-        help="Count only words",
-    )
-    parser.add_argument(
-        "-c",
-        "--characters",
-        action="store_true",
-        help="Count only characters",
-    )
-    parser.add_argument(
-        "files",
-        nargs="*",
-        type=argparse.FileType("r"),
-        default=[sys.stdin],
-        help="Input files",
-    )
-    args = parser.parse_args()
-    total_lines = total_words = total_characters = 0
-    if not any([args.lines, args.words, args.characters]):
-        args.lines = args.words = args.characters = True
-    for file in args.files:
-        counts = wc(file, args.lines, args.words, args.characters)
-        if args.lines and not args.words and not args.characters:
-            if len(args.files) == 1:
-                print(f"{counts[0]}")
+    try:
+        parser = argparse.ArgumentParser(description="Word count utility")
+        parser.add_argument(
+            "-l",
+            "--lines",
+            action="store_true",
+            help="Count only lines",
+        )
+        parser.add_argument(
+            "-w",
+            "--words",
+            action="store_true",
+            help="Count only words",
+        )
+        parser.add_argument(
+            "-c",
+            "--characters",
+            action="store_true",
+            help="Count only characters",
+        )
+        parser.add_argument(
+            "files",
+            nargs="*",
+            type=argparse.FileType("r"),
+            default=[sys.stdin],
+            help="Input files",
+        )
+        args = parser.parse_args()
+        total_lines = total_words = total_characters = 0
+        if not any([args.lines, args.words, args.characters]):
+            args.lines = args.words = args.characters = True
+        for file in args.files:
+            counts = wc(file, args.lines, args.words, args.characters)
+            if args.lines and not args.words and not args.characters:
+                if len(args.files) == 1:
+                    print(f"\t{counts[0]}")
+                else:
+                    print(f"\t{counts[0]} {file.name}")
+            elif not args.lines and args.words and not args.characters:
+                if len(args.files) == 1:
+                    print(f"\t{counts[1]}")
+                else:
+                    print(f"\t{counts[1]} {file.name}")
+            elif not args.lines and not args.words and args.characters:
+                if len(args.files) == 1:
+                    print(f"\t{counts[2]}")
+                else:
+                    print(f"\t{counts[2]} {file.name}")
+            elif args.lines and args.words and not args.characters:
+                if len(args.files) == 1:
+                    print(f"\t{counts[0]}\t{counts[1]}")
+                else:
+                    print(f"\t{counts[0]}\t{counts[1]} {file.name}")
+            elif not args.lines and args.words and args.characters:
+                if len(args.files) == 1:
+                    print(f"\t{counts[1]}\t{counts[2]}")
+                else:
+                    print(f"\t{counts[1]}\t{counts[2]} {file.name}")
+            elif args.lines and not args.words and args.characters:
+                if len(args.files) == 1:
+                    print(f"\t{counts[0]}\t{counts[2]}")
+                else:
+                    print(f"\t{counts[0]}\t{counts[2]} {file.name}")
             else:
-                print(f"{counts[0]}\t{file.name}")
-        elif args.words and not args.lines and not args.characters:
-            if len(args.files) == 1:
-                print(f"{counts[1]}")
+                if len(args.files) == 1:
+                    print(f"\t{counts[0]}\t{counts[1]}\t{counts[2]}")
+                else:
+                    print(f"\t{counts[0]}\t{counts[1]}\t{counts[2]} {file.name}")
+            total_lines += counts[0]
+            total_words += counts[1]
+            total_characters += counts[2]
+        if len(args.files) > 1:
+            if args.lines and not args.words and not args.characters:
+                print(f"\t{total_lines} total")
+            elif not args.lines and args.words and not args.characters:
+                print(f"\t{total_words} total")
+            elif not args.lines and not args.words and args.characters:
+                print(f"\t{total_characters} total")
+            elif args.lines and args.words and not args.characters:
+                print(f"\t{total_lines}\t{total_words}\ total")
+            elif not args.lines and args.words and args.characters:
+                print(f"\t{total_words}\t{total_characters} total")
+            elif args.lines and not args.words and args.characters:
+                print(f"\t{total_lines}\t{total_characters} total")
             else:
-                print(f"{counts[1]}\t{file.name}")
-        elif args.characters and not args.lines and not args.words:
-            if len(args.files) == 1:
-                print(f"{counts[2]}")
-            else:
-                print(f"{counts[2]}\t{file.name}")
-        else:
-            print(f"{counts[0]}\t{counts[1]}\t{counts[2]}\t{file.name}")
-        total_lines += counts[0]
-        total_words += counts[1]
-        total_characters += counts[2]
-    if len(args.files) > 1:
-        if args.lines and not args.words and not args.characters:
-            print(f"{total_lines}\ttotal")
-        elif args.words and not args.lines and not args.characters:
-            print(f"{total_words}\ttotal")
-        elif args.characters and not args.lines and not args.words:
-            print(f"{total_characters}\ttotal")
-        else:
-            print(f"{total_lines}\t{total_words}\t{total_characters}\ttotal")
+                print(f"\t{total_lines}\t{total_words}\t{total_characters} total")
+        sys.exit(0)
+    except Exception as e:
+        sys.stderr.write(f"Error: {e}\n")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
