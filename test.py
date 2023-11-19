@@ -44,7 +44,6 @@ def main():
             success = run_test(prog, name.rstrip(".in"))
             if not success:
                 failed_tests += 1
-                print(sys.exc_info())
                 if "OutputMismatch" in str(sys.exc_info()[1]):
                     output_mismatch_count += 1
 
