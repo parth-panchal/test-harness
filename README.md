@@ -1,9 +1,6 @@
 # Test Harness Project
 
-## Author
-
-- Parth Panchal
-- Stevens Login: [ppanchal1@stevens.edu](mailto:ppanchal1@stevens.edu)
+## Author: Parth Panchal, [ppanchal1@stevens.edu](mailto:ppanchal1@stevens.edu)
 
 ## GitHub Repository
 
