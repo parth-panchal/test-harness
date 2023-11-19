@@ -1,0 +1,11 @@
+o = {};
+o.age = 30;
+o.city = "New York";
+o.contact = {};
+o.contact.email = "john.doe@example.com";
+o.contact.phone = "+1 123-456-7890";
+o.name = "John Doe";
+o.skills = [];
+o.skills[0] = "Python";
+o.skills[1] = "JavaScript";
+o.skills[2] = "SQL";
